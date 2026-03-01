@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PythonでExcel作業を自動化する方法入門 - AI Work Stage Blog</title>
+<meta name="description" content="openpyxlやpandasを使ってExcelの繰り返し作業を自動化する入門ガイド。実際のコード例付き。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>PythonでExcel作業を自動化する方法入門</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>毎日繰り返すExcel作業をPythonで自動化すれば、大幅な時間短縮ができます。この記事では、PythonのExcel操作ライブラリを使った基本的な自動化を実際のコード例とともに解説します。</p>
+
+<h2>主要ライブラリの比較</h2>
+
+<table>
+<thead>
+<tr><th>ライブラリ</th><th>用途</th><th>特徴</th></tr>
+</thead>
+<tbody>
+<tr><td>openpyxl</td><td>.xlsx の読み書き</td><td>書式・グラフも操作可能</td></tr>
+<tr><td>pandas</td><td>データ処理・集計</td><td>大量データに強い・分析向き</td></tr>
+<tr><td>xlwings</td><td>Excelと連携</td><td>実行中のExcelを操作可能（Windows/Mac）</td></tr>
+</tbody>
+</table>
+
+<h2>環境セットアップ</h2>
+
+<pre><code># ライブラリのインストール
+pip install openpyxl pandas
+
+# バージョン確認
+python -c "import openpyxl; print(openpyxl.__version__)"
+python -c "import pandas; print(pandas.__version__)"</code></pre>
+
+<h2>基本操作：openpyxlでExcelを読み書き</h2>
+
+<h3>Excelファイルの読み込み</h3>
+<pre><code>import openpyxl
+
+# ファイルを開く
+wb = openpyxl.load_workbook('data.xlsx')
+ws = wb.active  # アクティブなシートを取得
+
+# セルの値を読み取る
+print(ws['A1'].value)  # A1セルの値
+print(ws.cell(row=2, column=3).value)  # B2セルの値
+
+# 全行を順番に処理
+for row in ws.iter_rows(min_row=2, values_only=True):
+    print(row)  # (値1, 値2, 値3, ...)のタプル</code></pre>
+
+<h3>Excelファイルへの書き込み</h3>
+<pre><code>import openpyxl
+
+wb = openpyxl.Workbook()
+ws = wb.active
+ws.title = "売上データ"
+
+# ヘッダー行を書き込む
+headers = ["日付", "商品名", "数量", "単価", "合計"]
+for col, header in enumerate(headers, 1):
+    ws.cell(row=1, column=col, value=header)
+
+# データを書き込む
+data = [
+    ("2026-03-01", "商品A", 10, 1000),
+    ("2026-03-01", "商品B", 5, 2000),
+]
+for row_idx, row_data in enumerate(data, 2):
+    for col_idx, value in enumerate(row_data, 1):
+        ws.cell(row=row_idx, column=col_idx, value=value)
+    # 合計列（E列）に計算式
+    ws.cell(row=row_idx, column=5, value=f"=C{row_idx}*D{row_idx}")
+
+wb.save('output.xlsx')
+print("保存完了")</code></pre>
+
+<h2>データ集計：pandasを使う</h2>
+
+<h3>Excelをpandasで読み込んで集計</h3>
+<pre><code>import pandas as pd
+
+# Excelを読み込む
+df = pd.read_excel('sales.xlsx', sheet_name='Sheet1')
+
+# 基本的な集計
+print(df.head())           # 最初の5行
+print(df.describe())       # 統計情報
+print(df['売上'].sum())    # 合計
+print(df['売上'].mean())   # 平均
+
+# グループ集計（商品別の合計売上）
+grouped = df.groupby('商品名')['売上'].sum().reset_index()
+print(grouped)
+
+# 結果をExcelに保存
+grouped.to_excel('summary.xlsx', index=False)
+print("集計完了")</code></pre>
+
+<h3>複数ファイルを結合する</h3>
+<pre><code>import pandas as pd
+import glob
+
+# フォルダ内の全xlsxファイルを読み込んで結合
+files = glob.glob('data/*.xlsx')
+dfs = []
+for f in files:
+    df = pd.read_excel(f)
+    df['ファイル名'] = f  # どのファイルか記録
+    dfs.append(df)
+
+# 全データを結合
+combined = pd.concat(dfs, ignore_index=True)
+combined.to_excel('combined.xlsx', index=False)
+print(f"{len(files)}ファイルを結合しました")</code></pre>
+
+<h2>実践例：月次レポート自動生成</h2>
+
+<pre><code>import pandas as pd
+from datetime import datetime
+
+def generate_monthly_report(input_file, output_file):
+    """月次売上レポートを自動生成"""
+    df = pd.read_excel(input_file)
+    df['日付'] = pd.to_datetime(df['日付'])
+    df['月'] = df['日付'].dt.to_period('M')
+
+    # 月別集計
+    monthly = df.groupby('月').agg({
+        '売上': 'sum',
+        '件数': 'count'
+    }).reset_index()
+    monthly.columns = ['月', '売上合計', '件数']
+
+    # Excelに出力
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='データ', index=False)
+        monthly.to_excel(writer, sheet_name='月別集計', index=False)
+
+    print(f"レポート生成完了: {output_file}")
+
+# 実行
+generate_monthly_report('sales_raw.xlsx', 'monthly_report.xlsx')</code></pre>
+
+<h2>注意点</h2>
+<ul>
+  <li>openpyxlは.xlsx形式のみ対応（.xls形式は別途xlrdが必要）</li>
+  <li>大きなファイルはメモリを多く消費するため、pandasの<code>chunksize</code>オプションを活用</li>
+  <li>パスワード保護されたファイルは直接開けない</li>
+</ul>
+
+<h2>まとめ</h2>
+<p>PythonのopenpyxlとpandasでExcel作業の大部分を自動化できます。特に「毎月同じ集計をしている」「複数ファイルを手動で結合している」といった作業は自動化の効果が大きいです。まずは小さな繰り返し作業から試してみてください。</p>
+
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://openpyxl.readthedocs.io" target="_blank" rel="noopener">openpyxl 公式ドキュメント</a>（参照日：2026-03-01）</li>
+    <li><a href="https://pandas.pydata.org/docs/" target="_blank" rel="noopener">pandas 公式ドキュメント</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。コードは動作確認を行っていますが、環境により挙動が異なる場合があります。情報は執筆時点のものです。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>

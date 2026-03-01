@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude APIの料金を徹底解説【2026年最新】 - AI Work Stage Blog</title>
+<meta name="description" content="Anthropic Claude APIの料金体系を詳しく解説。Haiku・Sonnet・Opusの違い、実際のコスト計算例まで。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>Claude APIの料金を徹底解説【2026年最新】</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>AnthropicのClaude APIは、高性能なAIを自分のアプリやワークフローに組み込める強力なサービスです。この記事では、2026年3月時点の公式料金情報をもとに、各モデルのコストと使い分けを解説します。</p>
+
+<h2>Claude APIの料金体系の基本</h2>
+<p>Claude APIはトークン（文字の単位）ベースの従量課金です。料金は「インプットトークン（入力）」と「アウトプットトークン（出力）」で別々に計算されます。一般的に、出力の方がインプットより高く設定されています。</p>
+
+<p>料金の単位は「1Mトークン（100万トークン）あたりのUSDドル」です。日本円換算は為替レートにより変動します。</p>
+
+<h2>主要モデルの料金比較（2026年3月時点）</h2>
+
+<table>
+<thead>
+<tr><th>モデル</th><th>インプット（/1Mトークン）</th><th>アウトプット（/1Mトークン）</th><th>特徴</th></tr>
+</thead>
+<tbody>
+<tr><td>Claude 3 Haiku</td><td>$0.25</td><td>$1.25</td><td>高速・低コスト</td></tr>
+<tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>バランス型・高性能</td></tr>
+<tr><td>Claude 3 Opus</td><td>$15.00</td><td>$75.00</td><td>最高性能</td></tr>
+<tr><td>Claude 3.5 Haiku</td><td>$0.80</td><td>$4.00</td><td>Haiku系最新版</td></tr>
+</tbody>
+</table>
+
+<p><strong>※上記は公式ページ（anthropic.com/api）掲載の料金を参照しています。料金は予告なく変更される場合があります。必ず公式サイトでご確認ください。</strong></p>
+
+<h2>実際のコスト計算例</h2>
+
+<h3>例1：日常的なチャット利用（Claude 3.5 Sonnet）</h3>
+<ul>
+  <li>1回の会話：インプット約2,000トークン＋アウトプット約1,000トークン</li>
+  <li>コスト：$0.006＋$0.015 ＝ 約$0.021（約3円）</li>
+  <li>1日100回の会話：約2.1ドル（約315円）</li>
+  <li>月換算：約63ドル（約9,450円）</li>
+</ul>
+
+<h3>例2：軽量なテキスト処理（Claude 3 Haiku）</h3>
+<ul>
+  <li>1回の処理：インプット約1,000トークン＋アウトプット約500トークン</li>
+  <li>コスト：$0.00025＋$0.000625 ＝ 約$0.000875（約0.13円）</li>
+  <li>1日1,000回処理：約0.875ドル（約131円）</li>
+  <li>月換算：約26ドル（約3,900円）</li>
+</ul>
+
+<h2>キャッシュ機能（Prompt Caching）</h2>
+<p>Anthropicはプロンプトキャッシュ機能を提供しています。同じシステムプロンプトを繰り返す場合、キャッシュヒット時のインプットコストが大幅に削減されます（通常の約10分の1）。長いシステムプロンプトを使う場合は積極的に活用しましょう。</p>
+
+<h2>無料枠はある？</h2>
+<p>2026年3月時点で、Claude APIに無料枠はありません。ただし、Anthropicは新規登録時に一定額のクレジットを付与することがあります（時期により変動）。最新情報は公式サイトでご確認ください。</p>
+
+<p>個人での試用であれば、claude.ai（Webインターフェース）の無料プランから始めるのが最もコストを抑えられます。</p>
+
+<h2>コストを抑える3つのポイント</h2>
+<ol>
+  <li><strong>用途に合ったモデルを選ぶ：</strong>複雑なタスクはSonnet、単純な処理はHaikuと使い分ける</li>
+  <li><strong>プロンプトを短くする：</strong>無駄な説明を省き、インプットトークンを削減</li>
+  <li><strong>キャッシュを活用：</strong>共通のシステムプロンプトはキャッシュで節約</li>
+</ol>
+
+<h2>まとめ</h2>
+<p>Claude APIは用途に応じたモデル選択が重要です。個人の自動化ツールにはHaiku、ビジネス用途の高品質なアウトプットにはSonnet、最高精度が必要なタスクにはOpusと使い分けることで、コストと品質のバランスをとれます。</p>
+
+</div>
+
+<div class="affiliate-box">
+  <strong>💡 Claude APIをVPS上で動かしたい方へ</strong>
+  <p>月額費用を抑えてAPIサーバーを運用するなら、Xserver VPSがおすすめです。国内データセンターで安定した環境を提供しています。</p>
+  <a href="https://px.a8.net/svt/ejp?a8mat=3TCJA4+XXXXXXX+XXXX+XXXXXX" class="btn" rel="nofollow">Xserver VPSを見る →</a>
+  <p class="notice">※アフィリエイトリンクを含みます</p>
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://www.anthropic.com/api" target="_blank" rel="noopener">Anthropic - Claude API公式ページ</a>（参照日：2026-03-01）</li>
+    <li><a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank" rel="noopener">Anthropic Docs - Models Overview</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。情報は執筆時点のものです。料金は変更される場合があります。最新情報は<a href="https://www.anthropic.com/api">Anthropic公式サイト</a>をご確認ください。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>

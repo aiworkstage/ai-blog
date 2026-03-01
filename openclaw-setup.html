@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClawでAIエージェントを自作する方法 - AI Work Stage Blog</title>
+<meta name="description" content="OpenClawを使って自分だけのAIアシスタント・エージェントを構築する手順を紹介。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>OpenClawでAIエージェントを自作する方法</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>OpenClawは、Claude APIをベースにした自己ホスト型AIエージェントフレームワークです。Discord・Telegram・WhatsAppなどのメッセージングプラットフォームと連携し、ファイル操作・ブラウザ操作・コード実行など多様なツールを持つAIアシスタントを構築できます。</p>
+
+<p>本記事では、OpenClawの基本的なセットアップ手順を解説します。なお、この記事自体がOpenClawによって作成されています。</p>
+
+<h2>OpenClawとは</h2>
+<p>OpenClawの主な特徴：</p>
+<ul>
+  <li><strong>セルフホスト：</strong>自分のサーバーやVPSで動作。データが外部に送られない</li>
+  <li><strong>マルチプラットフォーム：</strong>Discord・Telegram等と接続可能</li>
+  <li><strong>スキル拡張：</strong>独自のスキル（ツールセット）を追加できる</li>
+  <li><strong>ノード管理：</strong>複数デバイスをエージェントから制御</li>
+  <li><strong>Claude APIベース：</strong>Anthropic Claude を使用</li>
+</ul>
+
+<h2>必要なもの</h2>
+<ul>
+  <li>Node.js 18以上がインストールされたサーバーまたはPC</li>
+  <li>Anthropic APIキー（<a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>で取得）</li>
+  <li>接続したいプラットフォームのBot Token（Discord等）</li>
+</ul>
+
+<h2>インストール手順</h2>
+
+<h3>ステップ1：Node.jsのインストール</h3>
+<pre><code># Ubuntu/Debianの場合
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# バージョン確認
+node --version  # v20.x.x以上
+npm --version</code></pre>
+
+<h3>ステップ2：OpenClawのインストール</h3>
+<pre><code># npm でグローバルインストール
+npm install -g openclaw
+
+# インストール確認
+openclaw --version</code></pre>
+
+<h3>ステップ3：初期設定</h3>
+<pre><code># ワークスペースディレクトリを作成
+mkdir -p ~/.openclaw/workspace
+cd ~/.openclaw/workspace
+
+# 初期化（対話式セットアップ）
+openclaw setup</code></pre>
+
+<p>セットアップ時に以下を設定します：</p>
+<ul>
+  <li>Anthropic APIキー</li>
+  <li>使用するClaudeモデル（sonnet推奨）</li>
+  <li>接続するプラットフォーム</li>
+</ul>
+
+<h3>ステップ4：チャンネル設定（Discord例）</h3>
+<ol>
+  <li><a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a>でBotを作成</li>
+  <li>Bot TokenをコピーしてOpenClawに設定</li>
+  <li>BotをサーバーにInvite（必要なPermissions: Send Messages, Read Message History）</li>
+</ol>
+
+<h3>ステップ5：起動</h3>
+<pre><code># Gatewayの起動
+openclaw gateway start
+
+# ステータス確認
+openclaw gateway status</code></pre>
+
+<h2>SOUL.md と USER.md でカスタマイズ</h2>
+<p>OpenClawの強力な機能の一つが、ペルソナファイルによるカスタマイズです：</p>
+
+<ul>
+  <li><strong>SOUL.md：</strong>AIのキャラクター・口調・行動指針を定義</li>
+  <li><strong>USER.md：</strong>ユーザーの情報・好みを記録（AIが参照する）</li>
+  <li><strong>MEMORY.md：</strong>長期記憶（過去の会話の要点）</li>
+</ul>
+
+<p>これらのファイルを編集することで、自分だけのパーソナルAIアシスタントが作れます。</p>
+
+<h2>スキルの追加</h2>
+<p>OpenClawはスキルシステムで機能拡張が可能です。標準で含まれるスキル例：</p>
+<ul>
+  <li>weather：天気情報の取得</li>
+  <li>coding-agent：コーディングタスクの委任</li>
+  <li>video-frames：動画からフレーム抽出</li>
+  <li>openai-whisper：音声テキスト変換</li>
+</ul>
+
+<h2>コスト目安</h2>
+<p>OpenClaw自体は無料（オープンソース）です。ランニングコストはAnthropic APIの使用料のみ。軽量な個人利用であれば月$5〜$20程度が目安です（使い方により異なります）。</p>
+
+<h2>まとめ</h2>
+<p>OpenClawを使えば、自分だけのAIエージェントをセルフホストで構築できます。データのプライバシーを守りながら、Discord等を通じて高度なAI機能を活用できるのが最大のメリットです。</p>
+
+</div>
+
+<div class="affiliate-box">
+  <strong>💡 OpenClawをVPSで常時稼働させたい方へ</strong>
+  <p>Xserver VPSなら月額から利用でき、安定したLinux環境でOpenClawを24時間稼働させられます。</p>
+  <a href="https://px.a8.net/svt/ejp?a8mat=3TCJA4+XXXXXXX+XXXX+XXXXXX" class="btn" rel="nofollow">Xserver VPSを見る →</a>
+  <p class="notice">※アフィリエイトリンクを含みます</p>
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://openclaw.dev" target="_blank" rel="noopener">OpenClaw 公式サイト</a>（参照日：2026-03-01）</li>
+    <li><a href="https://www.npmjs.com/package/openclaw" target="_blank" rel="noopener">npmjs - openclaw</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。情報は執筆時点のものです。最新情報は公式サイトをご確認ください。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>

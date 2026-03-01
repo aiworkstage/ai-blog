@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stripeで決済を導入する方法【個人・法人対応】 - AI Work Stage Blog</title>
+<meta name="description" content="Stripe公式ドキュメントをもとに、決済導入の基本的な手順を解説。個人・法人どちらにも対応。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>Stripeで決済を導入する方法【個人・法人対応】</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>Stripeは世界で広く使われるオンライン決済プラットフォームです。初期費用なし・月額固定費なしで始められ、個人でも法人でも利用できます。この記事では、Stripe公式ドキュメントをもとに基本的な導入手順を解説します。</p>
+
+<h2>Stripeの料金体系（2026年3月時点）</h2>
+<p>Stripeの手数料（日本の場合）：</p>
+<ul>
+  <li><strong>国内カード：</strong>3.6%（Visa/Mastercard）</li>
+  <li><strong>海外カード：</strong>3.9%＋¥30</li>
+  <li><strong>月額固定費：</strong>なし</li>
+  <li><strong>振込手数料：</strong>250円/回</li>
+</ul>
+
+<p><strong>※手数料は変更される場合があります。<a href="https://stripe.com/jp/pricing" target="_blank" rel="noopener">Stripe公式の料金ページ</a>でご確認ください。</strong></p>
+
+<h2>アカウント登録</h2>
+<ol>
+  <li><a href="https://stripe.com/jp" target="_blank" rel="noopener">stripe.com/jp</a>にアクセス</li>
+  <li>メールアドレス・名前・パスワードを設定</li>
+  <li>メール認証を完了</li>
+  <li>本人確認（個人：マイナンバーカード等、法人：登記情報等）</li>
+  <li>銀行口座を登録</li>
+</ol>
+
+<p>⚠️ 本番決済（ライブモード）には審査があります。テストモードは審査前から利用可能です。</p>
+
+<h2>最もシンプルな導入方法：Payment Links</h2>
+<p>プログラミング不要で決済リンクを作成できます：</p>
+
+<ol>
+  <li>Stripeダッシュボードにログイン</li>
+  <li>「Payment Links」→「Create new link」</li>
+  <li>商品名・価格を設定</li>
+  <li>生成されたURLを顧客に共有</li>
+</ol>
+
+<p>物理的なモノを売る場合も、デジタルコンテンツも、この方法が最も手軽です。</p>
+
+<h2>プログラマー向け：Stripe Checkout の実装</h2>
+<p>自分のWebサイトに決済フォームを組み込む場合はStripe Checkoutを使います。</p>
+
+<h3>必要なもの</h3>
+<ul>
+  <li>Stripeアカウント（テスト用・本番用のAPIキーを取得）</li>
+  <li>サーバーサイドの環境（Node.js、Python等）</li>
+</ul>
+
+<h3>Node.jsでの実装例</h3>
+<pre><code>// npm install stripe
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// チェックアウトセッションの作成
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  line_items: [{
+    price_data: {
+      currency: 'jpy',
+      product_data: { name: '商品名' },
+      unit_amount: 1000,  // 1000円
+    },
+    quantity: 1,
+  }],
+  mode: 'payment',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel',
+});
+
+// session.url にリダイレクト</code></pre>
+
+<h2>Webhookの設定（重要）</h2>
+<p>決済完了後に自動処理（メール送信・DB更新等）をしたい場合はWebhookが必要です：</p>
+
+<ol>
+  <li>StripeダッシュボードでWebhook URLを登録</li>
+  <li><code>checkout.session.completed</code> イベントをリッスン</li>
+  <li>署名検証でセキュリティを確保</li>
+</ol>
+
+<pre><code>// Webhookハンドラ（Express.js）
+app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const event = stripe.webhooks.constructEvent(
+    req.body, sig, process.env.WEBHOOK_SECRET
+  );
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    // 決済完了後の処理
+    console.log('支払い完了:', session.id);
+  }
+
+  res.json({received: true});
+});</code></pre>
+
+<h2>テスト方法</h2>
+<p>本番前にテストカードで動作確認できます：</p>
+<ul>
+  <li>テスト成功：<code>4242 4242 4242 4242</code>（有効期限：任意の未来日付、CVC：任意3桁）</li>
+  <li>テスト失敗（残高不足）：<code>4000 0000 0000 9995</code></li>
+</ul>
+
+<h2>まとめ</h2>
+<p>Stripeは個人のデジタルコンテンツ販売から大規模ECまで対応できる柔軟な決済プラットフォームです。Payment Linksを使えばプログラミング不要で始められるため、まずは小規模からトライしてみることをお勧めします。</p>
+
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://stripe.com/jp/pricing" target="_blank" rel="noopener">Stripe - 料金ページ</a>（参照日：2026-03-01）</li>
+    <li><a href="https://stripe.com/docs/checkout/quickstart" target="_blank" rel="noopener">Stripe Docs - Checkout Quickstart</a>（参照日：2026-03-01）</li>
+    <li><a href="https://stripe.com/docs/webhooks" target="_blank" rel="noopener">Stripe Docs - Webhooks</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。情報は執筆時点のものです。最新情報は<a href="https://stripe.com/docs">Stripe公式ドキュメント</a>をご確認ください。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>

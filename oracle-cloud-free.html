@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle Cloud Always Freeの使い方【ARM 24GBを無料で】 - AI Work Stage Blog</title>
+<meta name="description" content="Oracle Cloud Always Freeで使えるARM仮想マシン（最大4コア・24GB RAM）のセットアップ方法を解説。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>Oracle Cloud Always Freeの使い方【ARM 24GBを無料で】</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>Oracle Cloud Infrastructure（OCI）には「Always Free」という永続無料枠があり、ARM（Ampere A1）インスタンスを最大4コア・24GB RAMまで無料で使えます。この記事では、Oracle公式ドキュメントをもとにセットアップ手順を解説します。</p>
+
+<h2>Oracle Cloud Always Freeの概要</h2>
+<p>Oracle Cloud Always Freeは、期限なしで利用できる無料リソースです。2026年3月時点の主なAlways Freeリソースは以下の通りです（公式ドキュメントより）：</p>
+
+<ul>
+  <li><strong>ARM（Ampere A1）インスタンス：</strong>合計4 OCPUs・24GB RAM（1インスタンスでも複数でも可）</li>
+  <li><strong>ストレージ：</strong>ブロックボリューム合計200GB</li>
+  <li><strong>ネットワーク：</strong>帯域幅10Mbps・月10TB送信</li>
+  <li><strong>オブジェクトストレージ：</strong>20GB</li>
+</ul>
+
+<p><strong>※Always Free枠はOracleのポリシーにより変更される可能性があります。必ず<a href="https://www.oracle.com/cloud/free/" target="_blank" rel="noopener">Oracle公式サイト</a>でご確認ください。</strong></p>
+
+<h2>アカウント登録</h2>
+
+<p>Oracle Cloud無料アカウントの作成手順：</p>
+
+<ol>
+  <li><a href="https://www.oracle.com/cloud/free/" target="_blank" rel="noopener">Oracle Cloud Free Tier</a>にアクセス</li>
+  <li>「Start for free」をクリック</li>
+  <li>メールアドレス・氏名・国などを入力（クレジットカードの登録が必要ですが、Always Free枠内では請求されません）</li>
+  <li>ホームリージョンを選択（後から変更不可。日本なら「Japan East（Tokyo）」または「Japan West（Osaka）」）</li>
+  <li>SMS認証・身分確認を完了</li>
+</ol>
+
+<p>⚠️ <strong>注意：</strong>ホームリージョンは一度設定すると変更できません。ARMインスタンスは特定リージョンで在庫が逼迫することがあるため、注意が必要です。</p>
+
+<h2>ARM仮想マシンの作成手順</h2>
+
+<h3>ステップ1：コンソールにログイン</h3>
+<p>OCIコンソール（cloud.oracle.com）にログインし、左上のメニューから「コンピュート」→「インスタンス」に移動します。</p>
+
+<h3>ステップ2：インスタンスの作成</h3>
+<ol>
+  <li>「インスタンスの作成」をクリック</li>
+  <li>名前を入力（例：my-arm-server）</li>
+  <li>「イメージとシェイプ」セクションで「シェイプの変更」をクリック</li>
+  <li>「Ampere」タブを選択し、「VM.Standard.A1.Flex」を選択</li>
+  <li>OCPUs：4、メモリ：24GBに設定（Always Free上限）</li>
+  <li>イメージ：Ubuntu 22.04またはOracle Linux（好みで選択）</li>
+</ol>
+
+<h3>ステップ3：SSHキーの設定</h3>
+<ol>
+  <li>「SSHキーの追加」セクションで「SSHキーペアの生成」を選択</li>
+  <li>秘密キーをダウンロード（.keyファイル）</li>
+  <li>または、既存の公開鍵を貼り付けることも可能</li>
+</ol>
+
+<h3>ステップ4：インスタンスの起動</h3>
+<p>「作成」ボタンをクリックするとインスタンスが起動します。パブリックIPアドレスが割り当てられます（数分かかります）。</p>
+
+<h2>SSHでの接続</h2>
+
+<pre><code># キーファイルの権限を変更
+chmod 600 ~/Downloads/your-key.key
+
+# SSH接続（Ubuntuの場合）
+ssh -i ~/Downloads/your-key.key ubuntu@YOUR_PUBLIC_IP
+
+# Oracle Linuxの場合
+ssh -i ~/Downloads/your-key.key opc@YOUR_PUBLIC_IP</code></pre>
+
+<h2>ファイアウォール設定</h2>
+<p>OCIのセキュリティリストでポートを開放する必要があります：</p>
+<ol>
+  <li>コンソールで「ネットワーキング」→「仮想クラウド・ネットワーク」→「セキュリティ・リスト」</li>
+  <li>「イングレス・ルールの追加」でポートを開放（例：80, 443, 22）</li>
+</ol>
+
+<p>また、OS側のファイアウォール（iptablesまたはfirewalld）の設定も必要です：</p>
+<pre><code># Ubuntuの場合（ufwを使用）
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable</code></pre>
+
+<h2>活用例</h2>
+<ul>
+  <li>Webサーバー（Nginx・Apache）のホスティング</li>
+  <li>VPNサーバー（WireGuard）の構築</li>
+  <li>Bot・APIサーバーの運用</li>
+  <li>GitHub Actionsのセルフホストランナー</li>
+  <li>Claude APIを使った自動化ツールのホスティング</li>
+</ul>
+
+<h2>注意点</h2>
+<ul>
+  <li>在庫不足でARMインスタンスが作成できない場合があります（Out of capacity）</li>
+  <li>長期間ログインしないとアカウントが非アクティブ化される場合があります</li>
+  <li>Always Free枠を超えると課金が発生するため、使用量のモニタリングを推奨します</li>
+</ul>
+
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://www.oracle.com/cloud/free/" target="_blank" rel="noopener">Oracle Cloud - Free Tier公式ページ</a>（参照日：2026-03-01）</li>
+    <li><a href="https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm" target="_blank" rel="noopener">Oracle Docs - Always Free Resources</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。情報は執筆時点のものです。最新情報は<a href="https://www.oracle.com/cloud/free/">Oracle公式サイト</a>をご確認ください。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>

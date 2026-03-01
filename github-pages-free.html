@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Pagesで無料ホームページを作る方法 - AI Work Stage Blog</title>
+<meta name="description" content="GitHubの無料ホスティング機能「GitHub Pages」を使って静的サイトを公開する手順を解説。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🤖 AI Work Stage Blog</h1>
+  <p>AI・自動化・副業の実践情報</p>
+</header>
+<nav class="site-nav">
+  <a href="index.html">ホーム</a>
+  <a href="https://aiworkstage.com">メインサイト</a>
+</nav>
+
+<div class="container">
+<article>
+<header>
+  <h1>GitHub Pagesで無料ホームページを作る方法</h1>
+  <time datetime="2026-03-01">2026年3月1日</time>
+  <p class="author">著者：AI Work Stage 編集部（AI執筆）</p>
+</header>
+
+<div class="content">
+
+<p>GitHub Pagesは、GitHubが提供する無料の静的サイトホスティングサービスです。本ブログもGitHub Pagesでホストされています。この記事では、GitHub公式ドキュメントをもとにセットアップ手順を解説します。</p>
+
+<h2>GitHub Pagesとは</h2>
+<p>GitHub Pagesの特徴（公式ドキュメントより）：</p>
+<ul>
+  <li><strong>完全無料：</strong>公開リポジトリなら無料でホスティング</li>
+  <li><strong>独自ドメイン対応：</strong>カスタムドメインを設定可能</li>
+  <li><strong>HTTPS自動：</strong>SSL証明書を自動発行</li>
+  <li><strong>CDN配信：</strong>Fastlyを通じてグローバルに高速配信</li>
+  <li><strong>Jekyll対応：</strong>Jekyllで静的サイト生成も可能</li>
+</ul>
+
+<p>⚠️ <strong>制限事項（公式より）：</strong>サイトあたり1GBのストレージ制限、月100GB帯域幅制限、毎時10ビルド制限あり。商用利用は利用規約を確認してください。</p>
+
+<h2>セットアップ手順</h2>
+
+<h3>方法1：ユーザーページ（username.github.io）</h3>
+
+<ol>
+  <li>GitHubにログインし、「New repository」で新しいリポジトリを作成</li>
+  <li>リポジトリ名を <code>username.github.io</code>（usernameはGitHubのユーザー名）に設定</li>
+  <li>Publicに設定してCreate</li>
+  <li>index.htmlをpushするだけで <code>https://username.github.io</code> で公開完了</li>
+</ol>
+
+<h3>方法2：プロジェクトページ（username.github.io/repo-name）</h3>
+
+<ol>
+  <li>任意の名前でリポジトリを作成（例：my-site）</li>
+  <li>Settings → Pages → Source で「Deploy from a branch」を選択</li>
+  <li>Branch：main、フォルダ：/（root）を選択してSave</li>
+  <li><code>https://username.github.io/my-site</code> でアクセス可能に</li>
+</ol>
+
+<h2>HTMLファイルの作成とpush</h2>
+
+<pre><code># リポジトリをクローン
+git clone https://github.com/username/my-site.git
+cd my-site
+
+# index.htmlを作成
+echo '&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;' > index.html
+
+# コミット＆プッシュ
+git add index.html
+git commit -m "Add index.html"
+git push origin main</code></pre>
+
+<p>pushから数分以内にサイトが公開されます。</p>
+
+<h2>カスタムドメインの設定</h2>
+
+<p>独自ドメイン（例：example.com）を使う場合：</p>
+
+<ol>
+  <li>リポジトリのルートに <code>CNAME</code> ファイルを作成し、ドメイン名を記載：<br><code>example.com</code></li>
+  <li>ドメインのDNS設定でCNAMEレコードを追加：<br><code>www CNAME username.github.io</code></li>
+  <li>またはApexドメインの場合はAレコード：<br>GitHub Pagesの公式IPアドレス（公式ドキュメント参照）を設定</li>
+  <li>Settings → Pages → Custom domain にドメインを入力</li>
+</ol>
+
+<h2>GitHub Actionsでの自動デプロイ</h2>
+<p>コードをpushするたびに自動でサイトを更新したい場合は、GitHub Actionsが便利です。</p>
+
+<pre><code># .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public</code></pre>
+
+<h2>向いている用途・向いていない用途</h2>
+
+<table>
+<thead><tr><th>向いている</th><th>向いていない</th></tr></thead>
+<tbody>
+<tr><td>ポートフォリオサイト</td><td>動的なWebアプリ（DBが必要なもの）</td></tr>
+<tr><td>技術ブログ</td><td>ユーザー認証が必要なサービス</td></tr>
+<tr><td>ドキュメントサイト</td><td>大量トラフィック（帯域制限あり）</td></tr>
+<tr><td>ランディングページ</td><td>サーバーサイド処理が必要なもの</td></tr>
+</tbody>
+</table>
+
+<h2>まとめ</h2>
+<p>GitHub Pagesは完全無料でHTTPS対応の静的サイトを公開できる優れたサービスです。シンプルなHTML/CSS/JSサイト、ドキュメント、ブログ（Jekyll等）に最適です。本ブログもGitHub Pagesを活用しています。</p>
+
+</div>
+
+<footer class="article-footer">
+  <h3>参考・引用元</h3>
+  <ul>
+    <li><a href="https://docs.github.com/en/pages" target="_blank" rel="noopener">GitHub Docs - GitHub Pages</a>（参照日：2026-03-01）</li>
+    <li><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages" target="_blank" rel="noopener">GitHub Docs - About GitHub Pages</a>（参照日：2026-03-01）</li>
+  </ul>
+  <p class="disclaimer">※本記事はAIが執筆しています。情報は執筆時点のものです。最新情報は<a href="https://docs.github.com/en/pages">GitHub公式ドキュメント</a>をご確認ください。</p>
+</footer>
+</article>
+</div>
+
+<footer class="site-footer">
+  <p>© 2026 AI Work Stage Blog</p>
+  <p>本ブログはAIが執筆しています。情報は執筆時点のものであり、最新情報は公式サイトをご確認ください。</p>
+</footer>
+</body>
+</html>
